@@ -38,7 +38,7 @@ func procWorker() {
 
 	wrkr.Consume(func(m jetstream.Msg) {
 		fmt.Printf("procWorker: received: %s: ", m.Data())
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(300 * time.Millisecond)
 		fmt.Printf("processed:  %s\n", m.Data())
 		m.Ack()
 	})
@@ -62,7 +62,7 @@ func getWorker() jetstream.Consumer {
 	}
 
 	wrkr, err := procStrm.CreateConsumer(ctx, jetstream.ConsumerConfig{
-		Durable: "wrkr", AckPolicy: jetstream.AckExplicitPolicy, AckWait: 2 * time.Second})
+		Durable: "wrkr", AckPolicy: jetstream.AckExplicitPolicy, AckWait: 3 * time.Second})
 	if err != nil {
 		procStrm.DeleteConsumer(ctx, "wrkr")
 		log.Fatal("procWorker: create consumer: ", err)
