@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embedgo/03_embed/public"
 	"fmt"
 	"io"
 	"log"
@@ -24,7 +25,9 @@ func init() {
 
 func main() {
 	procWorker()
-	http.HandleFunc("/proc", procHandler)
+	http.HandleFunc("/proc", procHandler)               // API team
+	http.HandleFunc("/stor", storHandler)               // API team
+	http.Handle("/", http.FileServerFS(public.Content)) // FrontEnd team
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 	ns.Shutdown()
@@ -35,21 +38,17 @@ func procWorker() {
 
 	wrkr.Consume(func(m jetstream.Msg) {
 		fmt.Printf("procWorker: received: %s: ", m.Data())
-		time.Sleep(300 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 		fmt.Printf("processed:  %s\n", m.Data())
 		m.Ack()
 	})
 
 }
-func getWorker() jetstream.Consumer {
-	nc, err := nats.Connect("", nats.InProcessServer(ns))
-	if err != nil {
-		log.Fatal("procWorker: Connect: ", err)
-	}
 
-	js, err := jetstream.New(nc)
+func getWorker() jetstream.Consumer {
+	js, err := getJetStream()
 	if err != nil {
-		log.Fatal("procWorker: new jetstream: ", err)
+		log.Fatal("getWorker: getJetStream: ", err)
 	}
 
 	ctx := context.Background()
@@ -87,23 +86,19 @@ func procHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
+	defer jetStreamClose(js)
 
 	ctx := context.Background()
 	for i := 0; i < nn; i++ {
 		if _, err := js.Publish(ctx, "proc", []byte(fmt.Sprintf("%s:%d", id, i))); err != nil {
 			log.Println("procHandler: publish: ", err)
 		}
-
 	}
 
 	io.WriteString(w, fmt.Sprintf("Request ID: %s: %d processing requests queued.\n", id, nn))
-
-	js.Conn().Flush()
-	js.Conn().Close()
-
 }
-func getJetStream() (jetstream.JetStream, error) {
 
+func getJetStream() (jetstream.JetStream, error) {
 	nc, err := nats.Connect("", nats.InProcessServer(ns))
 	if err != nil {
 		return nil, err
@@ -115,6 +110,7 @@ func getJetStream() (jetstream.JetStream, error) {
 	}
 	return js, nil
 }
+
 func embedNATS() {
 	var err error
 	opts := &server.Options{ServerName: "testServer", Trace: false, Debug: false, JetStream: true, Port: 4222, StoreDir: "/tmp/js"}
@@ -128,4 +124,48 @@ func embedNATS() {
 	if !ns.ReadyForConnections(5 * time.Second) {
 		log.Fatal("Could not connect to embedded NATS server")
 	}
+}
+
+func storHandler(w http.ResponseWriter, r *http.Request) {
+	js, err := getJetStream()
+	if err != nil {
+		log.Println("storHandler: getJetStream: ", err)
+	}
+	defer jetStreamClose(js)
+
+	ctx := context.Background()
+	kv, err := js.CreateKeyValue(ctx, jetstream.KeyValueConfig{Bucket: "myKV"})
+	if err != nil {
+		log.Println("storHandler: create KV: ", err)
+	}
+
+	switch r.Method {
+	case "GET":
+		k := r.FormValue("k")
+		v, err := kv.Get(ctx, k)
+		if err != nil {
+			fmt.Fprintf(w, "get: %s: %v\n", k, err)
+			return
+		}
+
+		fmt.Fprintf(w, "key: %s, value: %s\n", k, v.Value())
+	case "POST":
+		k := r.FormValue("k")
+		v := r.FormValue("v")
+		_, err := kv.Put(ctx, k, []byte(v))
+		if err != nil {
+			fmt.Fprintf(w, "put: %s: %s: %v\n", k, v, err)
+			return
+		}
+
+		fmt.Fprintf(w, "put %s into key: %s\n", v, k)
+	default:
+		fmt.Fprintf(w, "%s: handling not implemented\n", r.Method)
+	}
+
+}
+
+func jetStreamClose(js jetstream.JetStream) {
+	js.Conn().Flush()
+	js.Conn().Close()
 }

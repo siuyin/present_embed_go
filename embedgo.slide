@@ -79,5 +79,21 @@ demo: perhaps like this...
 cd 04_stream
 go build -o /tmp/j *.go
 /tmp/j
-curl 'http://localhost:8080/proc?id=A&n=10'
+curl 'http://localhost:8080/proc?id=A&n=10' && curl 'http://localhost:8080/proc?id=B&n=10'
+
+http://localhost:8080/
 ```
+
+## Embed a NATS message streaming server
+.code 04_stream/main.go /init/,/Shutdown/+1
+
+## procHandler: parse id and n
+.code 04_stream/main.go /func procHandler/,/Atoi/+3
+
+## procHandler: publish to "proc" stream
+.code 04_stream/main.go /getJetStream/,/^}/
+
+## procWorker works the "proc" stream
+.code 04_stream/main.go /func procWorker/,/^}/
+
+Note: Each message is explicitly acknowledged only after sucessful processing
