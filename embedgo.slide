@@ -38,4 +38,30 @@ http://localhost:8080/
   Use a minimal image like gcr.io/distroless/static-debian12  
   Copy the public html, javacript and css along with the Go binary  
   into the container image.
-- Static binary
+- Static binary:  
+  GOOS=windows GOARCH=amd64 go build -o mybin *.go  
+  go tool dist list
+
+## Embedding
+03_embed/main.go:
+
+.code 03_embed/main.go /import/,/public/
+⋮
+
+.code 03_embed/main.go /main\(\)/,/FileServerFS/
+
+
+03_embed/public/public.go:
+
+.code 03_embed/public/public.go
+
+## 
+demo:
+
+```
+cd 03_embed
+go build -o /tmp/j *.go
+/tmp/j
+hey -n 1000 -c 8 http://localhost:8080/
+hey -n 1000 -c 8 http://localhost:8080/hello
+```
