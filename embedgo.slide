@@ -1,0 +1,41 @@
+# Embedding with Go
+Gain performance, reliability and flexibility
+
+
+Loh Siu Yin
+Engineer, Beyond Broadcast LLP
+siuyin@beyondbroadcast.com
+
+## A simple production ready web API with Go
+
+## /hello API endpoint
+.code 01_web/main.go
+
+demo:
+```
+cd 01_web
+go run *.go
+hey -n 1000 -c 4 http://localhost:8080/hello
+```
+
+## How about a minimal frontend?
+
+## net/http FileServer
+.code 02_frontend/main.go
+
+## index.html
+.code 02_frontend/public/index.html
+
+demo:
+```
+cd 02_frontend
+go run *.go
+http://localhost:8080/
+```
+
+## Deployment packaging options
+- Docker container image:  
+  Use a minimal image like gcr.io/distroless/static-debian12  
+  Copy the public html, javacript and css along with the Go binary  
+  into the container image.
+- Static binary
