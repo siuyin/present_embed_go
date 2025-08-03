@@ -97,3 +97,24 @@ http://localhost:8080/
 .code 04_stream/main.go /func procWorker/,/^}/
 
 Note: Each message is explicitly acknowledged only after sucessful processing
+
+## Wait: there is even more ...
+demo:
+```
+cd 04_stream
+curl -X POST 'http://localhost:8080/stor?k=a&v=apple'
+curl -X POST 'http://localhost:8080/stor?k=b&v=boy'
+
+curl 'http://localhost:8080/stor?k=a'
+curl 'http://localhost:8080/stor?k=b'
+```
+
+## /stor endpoint: create a key-value store
+.code 04_stream/main.go /func storHandler/,/switch/-1
+
+## /stor endpoint: put and get
+.code 04_stream/main.go /r.Method/,/default:/-1
+
+## Source code:
+
+https://github.com/siuyin/present_embed_go
