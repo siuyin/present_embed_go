@@ -65,3 +65,19 @@ go build -o /tmp/j *.go
 hey -n 1000 -c 8 http://localhost:8080/
 hey -n 1000 -c 8 http://localhost:8080/hello
 ```
+
+## Objection! `real` APIs are not like /hello
+
+They take much more than 1 milli-second to complete!
+
+For example, order processing has to check the inventory database,
+perhaps located on a separate system. And may
+be require a **series** of API calls to execute.
+
+demo: perhaps like this...
+```
+cd 04_stream
+go build -o /tmp/j *.go
+/tmp/j
+curl 'http://localhost:8080/proc?id=A&n=10'
+```
