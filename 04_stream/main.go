@@ -41,7 +41,7 @@ func procWorker() {
 		time.Sleep(300 * time.Millisecond)
 		fmt.Printf("processed:  %s\n", m.Data())
 		m.Ack()
-	})
+	}, jetstream.PullMaxMessages(1))
 
 }
 
@@ -54,7 +54,7 @@ func getWorker() jetstream.Consumer {
 	ctx := context.Background()
 	procStrm, err := js.CreateStream(ctx, jetstream.StreamConfig{
 		Name: "proc", Subjects: []string{"proc"},
-		MaxAge: 72 * time.Hour,
+		Retention: jetstream.WorkQueuePolicy,
 	})
 	if err != nil {
 		js.DeleteStream(ctx, "proc")
@@ -62,7 +62,8 @@ func getWorker() jetstream.Consumer {
 	}
 
 	wrkr, err := procStrm.CreateConsumer(ctx, jetstream.ConsumerConfig{
-		Durable: "wrkr", AckPolicy: jetstream.AckExplicitPolicy, AckWait: 3 * time.Second})
+		Durable: "wrkr", AckPolicy: jetstream.AckExplicitPolicy,
+		AckWait: 3 * time.Second})
 	if err != nil {
 		procStrm.DeleteConsumer(ctx, "wrkr")
 		log.Fatal("procWorker: create consumer: ", err)
@@ -90,7 +91,7 @@ func procHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx := context.Background()
 	for i := 0; i < nn; i++ {
-		tm := time.Now().Format("04:05.0000000")
+		tm := time.Now().Format("04:05.000000")
 		if _, err := js.Publish(ctx, "proc", []byte(fmt.Sprintf("%s: %s:%d", tm, id, i))); err != nil {
 			log.Println("procHandler: publish: ", err)
 		}
