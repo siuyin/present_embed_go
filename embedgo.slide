@@ -125,7 +125,10 @@ curl 'http://localhost:8080/stor?k=b'
   within a single compiled binary.
 
 - NATS is a Go embeddable library that provides  
-  messages streaming and queuing, key-value and object stores.
+  messages streaming and queuing, key-value and object stores.  
+    
+  This enables CQRS (Command / Query Responsibility Segregation),  
+  choreography and orchestration patterns for event-driven systems.
 
 ## Source code:
 
