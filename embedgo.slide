@@ -115,6 +115,19 @@ curl 'http://localhost:8080/stor?k=b'
 ## /stor endpoint: put and get
 .code 04_stream/main.go /r.Method/,/default:/-1
 
+## Recap
+- Go has embedding and concurrency capabilities,  
+  enabling a micro-service pattern but  
+  encapsulated within a single binary deliverable.
+
+- Go's `embed` standard library function embeds  
+  HTML, javascript, css or other aribitrary files  
+  within a single compiled binary.
+
+- NATS is a Go embeddable library that provides  
+  messages streaming and queuing, key-value and object stores.
+
 ## Source code:
 
 https://github.com/siuyin/present_embed_go
+
