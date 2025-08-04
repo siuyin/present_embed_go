@@ -90,7 +90,8 @@ func procHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx := context.Background()
 	for i := 0; i < nn; i++ {
-		if _, err := js.Publish(ctx, "proc", []byte(fmt.Sprintf("%s:%d", id, i))); err != nil {
+		tm := time.Now().Format("04:05.0000000")
+		if _, err := js.Publish(ctx, "proc", []byte(fmt.Sprintf("%s: %s:%d", tm, id, i))); err != nil {
 			log.Println("procHandler: publish: ", err)
 		}
 	}
