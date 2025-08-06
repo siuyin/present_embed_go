@@ -14,7 +14,7 @@ siuyin@beyondbroadcast.com
 demo:
 ```
 cd 01_web
-go run *.go
+go run .
 hey -n 1000 -c 4 http://localhost:8080/hello
 ```
 
@@ -29,7 +29,7 @@ hey -n 1000 -c 4 http://localhost:8080/hello
 demo:
 ```
 cd 02_frontend
-go run *.go
+go run .
 http://localhost:8080/
 ```
 
@@ -60,7 +60,7 @@ demo:
 
 ```
 cd 03_embed
-go build -o /tmp/j *.go
+go build -o /tmp/j .
 /tmp/j
 hey -n 1000 -c 8 http://localhost:8080/
 hey -n 1000 -c 8 http://localhost:8080/hello
@@ -77,7 +77,7 @@ be require a **series** of API calls to execute.
 demo: perhaps like this...
 ```
 cd 04_stream
-go build -o /tmp/j *.go
+go build -o /tmp/j .
 /tmp/j
 curl 'http://localhost:8080/proc?id=A&n=10' && curl 'http://localhost:8080/proc?id=B&n=10'
 
