@@ -13,8 +13,8 @@ siuyin@beyondbroadcast.com
 
 demo:
 ```
-cd 01_web
-go run .
+go run ./01_web/
+
 hey -n 1000 -c 4 http://localhost:8080/hello
 ```
 
@@ -59,9 +59,7 @@ http://localhost:8080/
 demo:
 
 ```
-cd 03_embed
-go build -o /tmp/j .
-/tmp/j
+go run ./03_embed/
 hey -n 1000 -c 8 http://localhost:8080/
 hey -n 1000 -c 8 http://localhost:8080/hello
 ```
@@ -76,27 +74,40 @@ be require a **series** of API calls to execute.
 
 demo: perhaps like this...
 ```
-cd 04_stream
-go build -o /tmp/j .
-/tmp/j
+go run ./04_stream/
 curl 'http://localhost:8080/proc?id=A&n=10' && curl 'http://localhost:8080/proc?id=B&n=10'
 
 http://localhost:8080/
 ```
 
+What would happen if we terminate the program in the mid-processing?  
+A. DB corruption. Cannot recover.  
+B. State lost. Items remaining to be processed are not handled.  
+C. Interrupted item corrupted and not processed. Continue processing next item.  
+D. Interrupted item retried and processsing continues.
+
 ## Embed a NATS message streaming server
-.code 04_stream/main.go /init/,/Shutdown/+1
+.code -numbers 04_stream/main.go /init/,/Shutdown/+1
+
+Line 23: The secret is to **embed** a NATS JetStream server.  
+Line 28: Let us first focus how the processing was done during the demo.
 
 ## procHandler: parse id and n
-.code 04_stream/main.go /func procHandler/,/Atoi/+3
+.code -numbers 04_stream/main.go /func procHandler/,/Atoi/+3
+
+Line 74: This is a standard Go `net/http` handler.
 
 ## procHandler: publish to "proc" stream
-.code 04_stream/main.go /getJetStream/,/^}/
+.code -numbers 04_stream/main.go /Atoi/+3,/^}/
+
+Line 86: get a JetStream instance.  
+Line 95: Publish to `"proc"` topic.
 
 ## procWorker works the "proc" stream
-.code 04_stream/main.go /func procWorker/,/^}/
+.code -numbers 04_stream/main.go /func procWorker/,/^}/
 
-Note: Each message is explicitly acknowledged only after sucessful processing
+Line 41: Delay to simulate cpu-instensive work.  
+Line 43: Each message is explicitly acknowledged only after sucessful processing
 
 ## Wait: there is even more ...
 demo:
@@ -110,10 +121,16 @@ curl 'http://localhost:8080/stor?k=b'
 ```
 
 ## /stor endpoint: create a key-value store
-.code 04_stream/main.go /func storHandler/,/switch/-1
+.code -numbers 04_stream/main.go /func storHandler/,/switch/-1
+
+Line 132: The key-value store is built on JetStream.  
+Line 139: That JetStream instance is used to create the KV store.
 
 ## /stor endpoint: put and get
-.code 04_stream/main.go /r.Method/,/default:/-1
+.code -numbers 04_stream/main.go /r.Method/,/default:/-1
+
+Line 147: Get operation.  
+Line 157: Put operation.
 
 ## Recap
 - Go has embedding and concurrency capabilities,  
