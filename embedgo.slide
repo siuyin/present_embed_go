@@ -98,19 +98,19 @@ Line 30: Let us first focus how the processing was done during the demo.
 ## procHandler: parse id and n
 .code -numbers 04_stream/main.go /func procHandler/,/Atoi/+3
 
-Line 74: This is a standard Go `net/http` handler.
+Line 75: This is a standard Go `net/http` handler.
 
 ## procHandler: publish to "proc" stream
 .code -numbers 04_stream/main.go /Atoi/+3,/^}/
 
-Line 86: get a JetStream instance.  
-Line 95: Publish to `"proc"` topic.
+Line 87: get a JetStream instance.  
+Line 96: Publish to `"proc"` topic.
 
 ## procWorker works the "proc" stream
 .code -numbers 04_stream/main.go /func procWorker/,/^}/
 
-Line 41: Delay to simulate cpu-instensive work.  
-Line 43: Each message is explicitly acknowledged only after sucessful processing
+Line 42: Delay to simulate cpu-instensive work.  
+Line 44: Each message is explicitly acknowledged only after sucessful processing
 
 ## Wait: there is even more ...
 demo:
@@ -127,14 +127,14 @@ curl 'http://localhost:8080/stor?k=b'
 ## /stor endpoint: create a key-value store
 .code -numbers 04_stream/main.go /func storHandler/,/switch/-1
 
-Line 132: The key-value store is built on JetStream.  
-Line 139: That JetStream instance is used to create the KV store.
+Line 133: The key-value store is built on JetStream.  
+Line 140: That JetStream instance is used to create the KV store.
 
 ## /stor endpoint: put and get
 .code -numbers 04_stream/main.go /r.Method/,/default:/-1
 
-Line 147: Get operation.  
-Line 157: Put operation.
+Line 148: Get operation.  
+Line 158: Put operation.
 
 ## Recap
 - Go has embedding and concurrency capabilities,  
