@@ -115,7 +115,8 @@ Line 43: Each message is explicitly acknowledged only after sucessful processing
 ## Wait: there is even more ...
 demo:
 ```
-cd 04_stream
+go run ./04_stream/
+
 curl -X POST 'http://localhost:8080/stor?k=a&v=apple'
 curl -X POST 'http://localhost:8080/stor?k=b&v=boy'
 
