@@ -24,13 +24,14 @@ func init() {
 }
 
 func main() {
+	defer ns.Shutdown() // shutdown NATS server
+
 	procWorker()
 	http.HandleFunc("/proc", procHandler)               // API team
 	http.HandleFunc("/stor", storHandler)               // API team
 	http.Handle("/", http.FileServerFS(public.Content)) // FrontEnd team
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
-	ns.Shutdown()
 }
 
 func procWorker() {

@@ -90,10 +90,10 @@ C. Interrupted item corrupted and not processed. Continue processing next item.
 D. Interrupted item retried and processsing continues.
 
 ## Embed a NATS message streaming server
-.code -numbers 04_stream/main.go /init/,/Shutdown/+1
+.code -numbers 04_stream/main.go /init/,/Fatal/+1
 
 Line 23: The secret is to **embed** a NATS JetStream server.  
-Line 28: Let us first focus how the processing was done during the demo.
+Line 30: Let us first focus how the processing was done during the demo.
 
 ## procHandler: parse id and n
 .code -numbers 04_stream/main.go /func procHandler/,/Atoi/+3
