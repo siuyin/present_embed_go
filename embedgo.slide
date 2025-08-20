@@ -21,10 +21,13 @@ hey -n 1000 -c 4 http://localhost:8080/hello
 ## How about a minimal frontend?
 
 ## net/http FileServer
-.code 02_frontend/main.go
+.code -numbers 02_frontend/main.go
+
+Line 9: Serve files in `./public` at `/`.
 
 ## index.html
-.code 02_frontend/public/index.html
+.code -numbers 02_frontend/public/index.html
+External files: Lines 4, 12 and index.html itself.
 
 demo:
 ```
