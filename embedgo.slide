@@ -45,6 +45,9 @@ http://localhost:8080/
   GOOS=windows GOARCH=amd64 go build -o mybin *.go  
   go tool dist list
 
+What are the Pros and Cons of each deployment packaging method?
+
+
 ## Embedding
 03_embed/main.go:
 
